@@ -6,6 +6,12 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 
+import org.springframework.stereotype.Repository;
+
+import com.depromeet.models.dto.LoginRequest;
+import com.depromeet.models.dto.RegisterRequest;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 @Entity
 public class User {
 	@Id
@@ -53,5 +59,16 @@ public class User {
 	}
 	public void setImage(String image) {
 		this.image = image;
+	}
+	
+	public static User from(RegisterRequest req) {
+		User user = new User();
+		user.setEmail(req.getEmail());
+		user.setPassword(req.getPassword());
+		user.setNickname(req.getNickname());
+		user.setPhone(req.getPhone());
+		user.setImage(req.getImage());
+		
+		return user;
 	}
 }
