@@ -7,5 +7,6 @@ import com.depromeet.models.entity.User;
 
 @Repository
 public interface UserRepository extends JpaRepository<User, Long> {
+	
 	public User findOneByEmailAndPassword(String email, String password);
 }
