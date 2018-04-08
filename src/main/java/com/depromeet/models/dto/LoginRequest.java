@@ -3,6 +3,7 @@ package com.depromeet.models.dto;
 import com.depromeet.models.entity.User;
 
 public class LoginRequest {
+	
 	private String email;
 	private String password;
 	

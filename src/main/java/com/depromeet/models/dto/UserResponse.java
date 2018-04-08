@@ -3,8 +3,8 @@ package com.depromeet.models.dto;
 import com.depromeet.models.entity.User;
 
 public class UserResponse {
+	
 	private int userId;
-
 	private String email;
 	private String nickname;
 	private String phone;
@@ -52,6 +52,7 @@ public class UserResponse {
 
 	public static UserResponse from(User user) {
 		UserResponse userResponse = new UserResponse();
+		userResponse.setUserId(user.getUserId());
 		userResponse.setEmail(user.getEmail());
 		userResponse.setNickname(user.getEmail());
 		userResponse.setPhone(user.getPhone());

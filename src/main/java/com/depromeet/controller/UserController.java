@@ -8,7 +8,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -26,7 +25,7 @@ public class UserController {
 
 	@GetMapping(path = "/users")
 	@ResponseStatus(HttpStatus.OK)
-	public @ResponseBody List<UserResponse> getAllUsers() {
+	public List<UserResponse> getAllUsers() {
 		return userService.getAllUser()
 				.stream()
 				.map(user -> UserResponse.from(user))
@@ -35,14 +34,14 @@ public class UserController {
 
 	@PostMapping(path = "/login")
 	@ResponseStatus(HttpStatus.OK)
-	public @ResponseBody UserResponse getUser(@RequestBody LoginRequest req) {
+	public UserResponse getUser(@RequestBody LoginRequest req) {
 		User user = userService.getUser(req.getEmail(), req.getPassword());
 		return UserResponse.from(user);
 	}
 
 	@PostMapping(path = "/register")
 	@ResponseStatus(HttpStatus.CREATED)
-	public @ResponseBody void register(@RequestBody RegisterRequest req) {
+	public void register(@RequestBody RegisterRequest req) {
 		userService.addUser(User.from(req));
 	}
 }
