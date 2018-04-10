@@ -4,14 +4,14 @@ grant all on dpm2018.* to 'dpm'@'localhost'; -- Gives all the privileges to the 
 
 use dpm2018;
 
-create table member (
-	member_id int(5) unsigned NOT NULL,
+create table user (
+	user_id int(5) unsigned NOT NULL AUTO_INCREMENT,
 	email VARCHAR(255) NOT NULL,
     password VARCHAR(255) NOT NULL,
     nickname VARCHAR(255) NOT NULL,
     phone VARCHAR(255),
     image VARCHAR(255),
-    primary key (member_id)
+    primary key (user_id)
 );
 
-select * from member;
+select * from user;
