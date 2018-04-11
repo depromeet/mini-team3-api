@@ -5,6 +5,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -18,7 +19,10 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import com.depromeet.exception.InternalServerErrorException;
+import com.depromeet.exception.UnprocessableEntityException;
 import com.depromeet.models.dto.ImageUploadResponse;
+import com.depromeet.service.ImageService;
 import com.depromeet.utils.FileUtils;
 
 @RestController
@@ -28,34 +32,28 @@ public class ImageUploadController {
 	public static final String BASE_DIRECTORY = System.getProperty("user.dir") + "/upload";
 	public static final String UPLOAD_DIRECTORY = "/images/";
 	
+	@Autowired
+	private ImageService imageService;
+	
     @PostMapping("/upload")
 	@ResponseStatus(HttpStatus.OK)
-    public ImageUploadResponse singleFileUpload(@RequestParam("file") MultipartFile file,
-                                   RedirectAttributes redirectAttributes) {
+	public ImageUploadResponse singleFileUpload(@RequestParam("file") MultipartFile file,
+			RedirectAttributes redirectAttributes) {
+
         if (file.isEmpty()) {
-            redirectAttributes.addFlashAttribute("message", "Please select a file to upload");
-            return null;
+        	throw new UnprocessableEntityException("업로드할 파일을 선택해주세요.");
         }
         
-        Path dirPath = null;
         String fileName = "";
         try {
-            byte[] bytes = file.getBytes();
-            dirPath = Paths.get(BASE_DIRECTORY + UPLOAD_DIRECTORY);
-            
-            if (Files.notExists(dirPath)) {
-            	Files.createDirectories(dirPath);
-            }
-            Path filePath = Files.createTempFile(dirPath, "profile_",
+            fileName = imageService.uploadImage(file.getBytes(),
+            		BASE_DIRECTORY + UPLOAD_DIRECTORY,
+            		file.getOriginalFilename(),
+            		"profile_",
             		"." + FileUtils.getFileExtension(file.getOriginalFilename()));
-            Files.write(filePath, bytes);
             
-            fileName = filePath.getFileName().toString();
-
-            redirectAttributes.addFlashAttribute("message",
-                    "You successfully uploaded '" + file.getOriginalFilename() + "'");
         } catch (IOException e) {
-            e.printStackTrace();
+            throw new InternalServerErrorException("파일을 업로드하지 못했습니다.");
         }
         
         return new ImageUploadResponse(UPLOAD_DIRECTORY + fileName);
@@ -64,15 +62,15 @@ public class ImageUploadController {
     @GetMapping("/{fileName:.+}")
     @ResponseStatus(HttpStatus.OK)
     public ResponseEntity<byte[]> view(@PathVariable String fileName) {
-    	byte[] imageBytes = null;
+    	byte[] imageData = null;
     	
     	try {
 	    	Path path = Paths.get(BASE_DIRECTORY + UPLOAD_DIRECTORY + fileName);
-	    	imageBytes = Files.readAllBytes(path);
+	    	imageData = Files.readAllBytes(path);
     	} catch (IOException e) {
-    		e.printStackTrace();
+            throw new InternalServerErrorException("파일을 조회하지 못했습니다.");
     	}
     	
-    	return ResponseEntity.ok().contentType(MediaType.IMAGE_JPEG).body(imageBytes);
+    	return ResponseEntity.ok().contentType(MediaType.IMAGE_JPEG).body(imageData);
     }
 }

@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.depromeet.exception.UnauthorizedException;
 import com.depromeet.models.dto.LoginRequest;
 import com.depromeet.models.dto.RegisterRequest;
 import com.depromeet.models.dto.UserResponse;
@@ -36,6 +37,10 @@ public class UserController {
 	@ResponseStatus(HttpStatus.OK)
 	public UserResponse getUser(@RequestBody LoginRequest req) {
 		User user = userService.getUser(req.getEmail(), req.getPassword());
+		if (user == null) {
+			throw new UnauthorizedException("아이디 또는 비밀번호가 틀렸습니다.");
+		}
+		
 		return UserResponse.from(user);
 	}
 
